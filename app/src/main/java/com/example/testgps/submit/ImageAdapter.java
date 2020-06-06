@@ -65,7 +65,7 @@ public class ImageAdapter extends RecyclerView.Adapter {
                 @Override
                 public void onClick(View v) {
                     if(fileBean == null){
-                        ((SubmitActivity)ViewHolder.this.context).clickAddPic();
+                        //((SubmitActivity)ViewHolder.this.context).clickAddPic();
                     }
                 }
             });

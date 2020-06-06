@@ -54,6 +54,7 @@ dependencies {
     implementation 'com.alibaba:fastjson:1.2.54'
     //implementation 'com.github.wildma:PictureSelector:2.0.0'
     implementation 'com.github.LuckSiege.PictureSelector:picture_library:v2.5.6'
+    implementation 'com.jph.takephoto:takephoto_library:4.0.3'
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     implementation 'com.amap.api:map2d:6.0.0'
     implementation 'com.amap.api:location:3.3.0'

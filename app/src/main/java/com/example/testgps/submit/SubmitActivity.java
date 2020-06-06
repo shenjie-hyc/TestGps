@@ -13,8 +13,10 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
@@ -29,18 +31,19 @@ import com.example.testgps.http.HttpUtil;
 import com.example.testgps.model.bean.GpsBean;
 import com.example.testgps.util.GlideEngine;
 import com.example.testgps.util.ToastUtil;
-import com.luck.picture.lib.PictureSelectionModel;
 import com.luck.picture.lib.PictureSelector;
+import com.luck.picture.lib.config.PictureConfig;
 import com.luck.picture.lib.config.PictureMimeType;
 import com.luck.picture.lib.entity.LocalMedia;
 import com.luck.picture.lib.listener.OnResultCallbackListener;
+
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class SubmitActivity extends AppCompatActivity implements AMapLocationListener, ActivityCompat.OnRequestPermissionsResultCallback {
+public class SubmitActivity extends AppCompatActivity implements AMapLocationListener, ActivityCompat.OnRequestPermissionsResultCallback, View.OnClickListener {
     private static final int PERMISSON_REQUESTCODE = 0;
     protected String[] needPermissions = {
             Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -50,7 +53,7 @@ public class SubmitActivity extends AppCompatActivity implements AMapLocationLis
             Manifest.permission.READ_PHONE_STATE
 
     };
-    private RecyclerView list;
+    //private RecyclerView list;
     private TextView txt_gps;
     private TextView txt_address;
     private TextView btn_gps;
@@ -59,6 +62,10 @@ public class SubmitActivity extends AppCompatActivity implements AMapLocationLis
     double lon;
     String address;
     GpsBean gpsBean = new GpsBean();
+    private ImageView img1;
+    private ImageView img2;
+    private ImageView img3;
+    private ImageView img4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,12 +75,12 @@ public class SubmitActivity extends AppCompatActivity implements AMapLocationLis
     }
 
     private void initView() {
-        list = (RecyclerView) findViewById(R.id.list);
+        // list = (RecyclerView) findViewById(R.id.list);
         txt_gps = (TextView) findViewById(R.id.txt_gps);
         txt_address = (TextView) findViewById(R.id.txt_address);
         btn_gps = (TextView) findViewById(R.id.btn_gps);
         btn_submit = (TextView) findViewById(R.id.btn_submit);
-        list.setAdapter(new ImageAdapter(this, gpsBean.getImgList()));
+        //list.setAdapter(new ImageAdapter(this, gpsBean.getImgList()));
         checkPermissions(needPermissions);
         btn_gps.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,16 +88,25 @@ public class SubmitActivity extends AppCompatActivity implements AMapLocationLis
                 onGps();
             }
         });
+        img1 = (ImageView) findViewById(R.id.img1);
+        img1.setOnClickListener(this);
+        img2 = (ImageView) findViewById(R.id.img2);
+        img2.setOnClickListener(this);
+        img3 = (ImageView) findViewById(R.id.img3);
+        img3.setOnClickListener(this);
+        img4 = (ImageView) findViewById(R.id.img4);
+        img4.setOnClickListener(this);
     }
 
-    public void clickAddPic() {
+    public void clickAddPic(final int index) {
         PictureSelector.create(this)
                 .openGallery(PictureMimeType.ofAll())
+                .selectionMode(PictureConfig.SINGLE)
                 .loadImageEngine(GlideEngine.createGlideEngine())
                 .forResult(new OnResultCallbackListener<LocalMedia>() {
                     @Override
                     public void onResult(List<LocalMedia> result) {
-                        upImg(result);
+                        upImg(result,index);
                     }
 
                     @Override
@@ -238,36 +254,99 @@ public class SubmitActivity extends AppCompatActivity implements AMapLocationLis
         intent.setData(Uri.parse("package:" + getPackageName()));
         startActivity(intent);
     }
-    private void upImg(List<LocalMedia> result){
-        for(int i = 0;i<result.size();i++){
-            final int index = i;
-            LocalMedia localMedia = result.get(i);
+
+    private void upImg(List<LocalMedia> result,int index) {
+        LocalMedia localMedia = result.get(0);
             try {
                 HttpUtil.uploadFile(localMedia.getPath(), localMedia.getFileName(), new HttpUtil.MyCallback() {
                     @Override
                     public void onFailure(String message) {
-                        ToastUtil.showToast(SubmitActivity.this,message);
+                        ToastUtil.showToast(SubmitActivity.this, message);
 
                     }
-
                     @Override
                     public void onError(String message) {
-                        ToastUtil.showToast(SubmitActivity.this,message);
+                        ToastUtil.showToast(SubmitActivity.this, message);
 
                     }
 
                     @Override
                     public void onSuccess(JSONObject jsonObject) {
-                        ToastUtil.showToast(SubmitActivity.this,jsonObject.toJSONString());
-                   switch(index){
-                       case 0:
-                           gpsBean.setImg1Url("");
-                   }
+                        ToastUtil.showToast(SubmitActivity.this, jsonObject.toJSONString());
+                        switch (index) {
+                            case 0:
+                                gpsBean.setImg1Url(jsonObject.getString("message"));
+                            case 1:
+                                gpsBean.setImg2Url(jsonObject.getString("message"));
+                            case 2:
+                                gpsBean.setImg3Url(jsonObject.getString("message"));
+                            case 3:
+                                gpsBean.setImg4Url(jsonObject.getString("message"));
+                        }
+                        updateImg();
                     }
                 });
             } catch (Exception e) {
                 e.printStackTrace();
             }
+    }
+    private void updateImg(){
+//        if(TextUtils.isEmpty(gpsBean.getImg1Url())){
+//            img2.setVisibility(View.INVISIBLE);
+//            img1.setImageResource(R.drawable.add);
+//        }else{
+//            setImage(img1,gpsBean.getImg1Url());
+//            img2.setVisibility(View.VISIBLE);
+//        }
+//        if(TextUtils.isEmpty(gpsBean.getImg2Url())){
+//            img3.setVisibility(View.INVISIBLE);
+//            img2.setImageResource(R.drawable.add);
+//        }else{
+//            setImage(img2,gpsBean.getImg2Url());
+//            img3.setVisibility(View.VISIBLE);
+//        }
+//        if(TextUtils.isEmpty(gpsBean.getImg3Url())){
+//            img4.setVisibility(View.INVISIBLE);
+//            img3.setImageResource(R.drawable.add);
+//        }else{
+//            setImage(img3,gpsBean.getImg3Url());
+//            img4.setVisibility(View.VISIBLE);
+//        }
+//        if(TextUtils.isEmpty(gpsBean.getImg4Url())){
+//            img4.setImageResource(R.drawable.add);
+//        }else{
+//            setImage(img4,gpsBean.getImg4Url());
+//        }
+        setImage(img1,gpsBean.getImg1Url());
+        setImage(img2,gpsBean.getImg2Url());
+        setImage(img3,gpsBean.getImg3Url());
+        setImage(img4,gpsBean.getImg4Url());
+    }
+    private void setImage(ImageView image, String url) {
+        if(TextUtils.isEmpty(url)){
+            image.setVisibility(View.INVISIBLE);
+        }else{
+        Glide.with(SubmitActivity.this).load(HttpUtil.URL+"sys/common/static/"+url).error(R.drawable.picture_icon_data_error).into(image);
+    }
+    }
+
+
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.img1:
+                clickAddPic(0);
+                break;
+            case R.id.img2:
+                clickAddPic(1);
+                break;
+            case R.id.img3:
+                clickAddPic(2);
+                break;
+            case R.id.img4:
+                clickAddPic(3);
+                break;
         }
     }
 }

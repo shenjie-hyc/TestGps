@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private void initData(){
         UserBean userBean = UserModel.getUserModel().getUserBean();
 
-        txt_id.setText(userBean.getId());
+        txt_id.setText(userBean.getWorkNo());
         txt_name.setText(userBean.getRealname());
     }
 }

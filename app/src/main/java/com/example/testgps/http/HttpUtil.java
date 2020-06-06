@@ -84,7 +84,7 @@ public class HttpUtil {
     public static void uploadFile(String filePath, String fileName, final MyCallback callback) throws Exception {
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("file", "fileName",
+                .addFormDataPart("file", fileName,
                         RequestBody.create(MEDIA_TYPE_PNG, new File(filePath)))
                 .build();
 
@@ -106,8 +106,8 @@ public class HttpUtil {
             @Override
             public void onResponse(Call call, final Response response) throws IOException {
                 String str = response.body().string();
-                Log.d("AAA","response"+str);
-                final JSONObject jsonObject = (JSONObject) JSON.parse(response.body().string());
+                Log.d("AAA", "response : " + str);
+                final JSONObject jsonObject = (JSONObject) JSON.parse(str);
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
