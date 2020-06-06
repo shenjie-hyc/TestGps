@@ -96,6 +96,7 @@ public class SubmitActivity extends AppCompatActivity implements AMapLocationLis
         img3.setOnClickListener(this);
         img4 = (ImageView) findViewById(R.id.img4);
         img4.setOnClickListener(this);
+        btn_submit.setOnClickListener(this);
     }
 
     public void clickAddPic(final int index) {
@@ -106,7 +107,7 @@ public class SubmitActivity extends AppCompatActivity implements AMapLocationLis
                 .forResult(new OnResultCallbackListener<LocalMedia>() {
                     @Override
                     public void onResult(List<LocalMedia> result) {
-                        upImg(result,index);
+                        upImg(result, index);
                     }
 
                     @Override
@@ -255,81 +256,84 @@ public class SubmitActivity extends AppCompatActivity implements AMapLocationLis
         startActivity(intent);
     }
 
-    private void upImg(List<LocalMedia> result,int index) {
+    private void upImg(List<LocalMedia> result, int index) {
         LocalMedia localMedia = result.get(0);
-            try {
-                HttpUtil.uploadFile(localMedia.getPath(), localMedia.getFileName(), new HttpUtil.MyCallback() {
-                    @Override
-                    public void onFailure(String message) {
-                        ToastUtil.showToast(SubmitActivity.this, message);
+        try {
+            HttpUtil.uploadFile(localMedia.getPath(), localMedia.getFileName(), new HttpUtil.MyCallback() {
+                @Override
+                public void onFailure(String message) {
+                    ToastUtil.showToast(SubmitActivity.this, message);
 
-                    }
-                    @Override
-                    public void onError(String message) {
-                        ToastUtil.showToast(SubmitActivity.this, message);
+                }
 
-                    }
+                @Override
+                public void onError(String message) {
+                    ToastUtil.showToast(SubmitActivity.this, message);
 
-                    @Override
-                    public void onSuccess(JSONObject jsonObject) {
-                        ToastUtil.showToast(SubmitActivity.this, jsonObject.toJSONString());
-                        switch (index) {
-                            case 0:
-                                gpsBean.setImg1Url(jsonObject.getString("message"));
-                            case 1:
-                                gpsBean.setImg2Url(jsonObject.getString("message"));
-                            case 2:
-                                gpsBean.setImg3Url(jsonObject.getString("message"));
-                            case 3:
-                                gpsBean.setImg4Url(jsonObject.getString("message"));
-                        }
-                        updateImg();
+                }
+
+                @Override
+                public void onSuccess(JSONObject jsonObject) {
+                    ToastUtil.showToast(SubmitActivity.this, jsonObject.toJSONString());
+                    switch (index) {
+                        case 0:
+                            gpsBean.setImg1Url(jsonObject.getString("message"));
+                            break;
+                        case 1:
+                            gpsBean.setImg2Url(jsonObject.getString("message"));
+                            break;
+                        case 2:
+                            gpsBean.setImg3Url(jsonObject.getString("message"));
+                            break;
+                        case 3:
+                            gpsBean.setImg4Url(jsonObject.getString("message"));
+                            break;
                     }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                    updateImg();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-    private void updateImg(){
-//        if(TextUtils.isEmpty(gpsBean.getImg1Url())){
-//            img2.setVisibility(View.INVISIBLE);
-//            img1.setImageResource(R.drawable.add);
-//        }else{
-//            setImage(img1,gpsBean.getImg1Url());
-//            img2.setVisibility(View.VISIBLE);
-//        }
-//        if(TextUtils.isEmpty(gpsBean.getImg2Url())){
-//            img3.setVisibility(View.INVISIBLE);
-//            img2.setImageResource(R.drawable.add);
-//        }else{
-//            setImage(img2,gpsBean.getImg2Url());
-//            img3.setVisibility(View.VISIBLE);
-//        }
-//        if(TextUtils.isEmpty(gpsBean.getImg3Url())){
-//            img4.setVisibility(View.INVISIBLE);
-//            img3.setImageResource(R.drawable.add);
-//        }else{
-//            setImage(img3,gpsBean.getImg3Url());
-//            img4.setVisibility(View.VISIBLE);
-//        }
-//        if(TextUtils.isEmpty(gpsBean.getImg4Url())){
-//            img4.setImageResource(R.drawable.add);
-//        }else{
-//            setImage(img4,gpsBean.getImg4Url());
-//        }
-        setImage(img1,gpsBean.getImg1Url());
-        setImage(img2,gpsBean.getImg2Url());
-        setImage(img3,gpsBean.getImg3Url());
-        setImage(img4,gpsBean.getImg4Url());
-    }
-    private void setImage(ImageView image, String url) {
-        if(TextUtils.isEmpty(url)){
-            image.setVisibility(View.INVISIBLE);
+
+    private void updateImg() {
+        if(TextUtils.isEmpty(gpsBean.getImg1Url())){
+            img2.setVisibility(View.INVISIBLE);
+            img1.setImageResource(R.drawable.add);
         }else{
-        Glide.with(SubmitActivity.this).load(HttpUtil.URL+"sys/common/static/"+url).error(R.drawable.picture_icon_data_error).into(image);
-    }
+            setImage(img1,gpsBean.getImg1Url());
+            img2.setVisibility(View.VISIBLE);
+        }
+        if(TextUtils.isEmpty(gpsBean.getImg2Url())){
+            img3.setVisibility(View.INVISIBLE);
+            img2.setImageResource(R.drawable.add);
+        }else{
+            setImage(img2,gpsBean.getImg2Url());
+            img3.setVisibility(View.VISIBLE);
+        }
+        if(TextUtils.isEmpty(gpsBean.getImg3Url())){
+            img4.setVisibility(View.INVISIBLE);
+            img3.setImageResource(R.drawable.add);
+        }else{
+            setImage(img3,gpsBean.getImg3Url());
+            img4.setVisibility(View.VISIBLE);
+        }
+        if(TextUtils.isEmpty(gpsBean.getImg4Url())){
+            img4.setImageResource(R.drawable.add);
+        }else{
+            setImage(img4,gpsBean.getImg4Url());
+        }
+//        setImage(img1, gpsBean.getImg1Url());
+//        setImage(img2, gpsBean.getImg2Url());
+//        setImage(img3, gpsBean.getImg3Url());
+//        setImage(img4, gpsBean.getImg4Url());
     }
 
+    private void setImage(ImageView image, String url) {
+        Glide.with(SubmitActivity.this).load(HttpUtil.URL + "sys/common/static/" + url).error(R.drawable.picture_icon_data_error).into(image);
+
+    }
 
 
     @Override
@@ -347,6 +351,39 @@ public class SubmitActivity extends AppCompatActivity implements AMapLocationLis
             case R.id.img4:
                 clickAddPic(3);
                 break;
+            case R.id.btn_submit:
+                submit();
+                break;
+
         }
+    }
+    private void submit(){
+        //int [] ids = getResources().getIntArray(R.array.aaa);
+        gpsBean.setLat(lat);
+        gpsBean.setLng(lon);
+        gpsBean.setAddress(address);
+        if(gpsBean.getLat() == 0){
+            ToastUtil.showToast(this,"请先定位！");
+            return;
+        }
+        HttpUtil.post("gps/add", gpsBean, new HttpUtil.MyCallback() {
+            @Override
+            public void onFailure(String message) {
+                ToastUtil.showToast(SubmitActivity.this,"请先定位！");
+
+            }
+
+            @Override
+            public void onError(String message) {
+                ToastUtil.showToast(SubmitActivity.this,message);
+
+            }
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                ToastUtil.showToast(SubmitActivity.this,"上传成功！");
+                finish();
+            }
+        });
     }
 }

@@ -21,7 +21,7 @@
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">200dp</item>
         <item name="android:layout_columnWeight">1</item>
-        <item name="android:src">@drawable/add</item>
+        <item name="android:src">@drawable/icon_load</item>
     </style>
 
 </resources>

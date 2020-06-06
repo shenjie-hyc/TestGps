@@ -111,10 +111,10 @@ public class HttpUtil {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (response.code() != 200 || jsonObject.getInteger("code") != 200) {
+                        if (response.code() != 200 || !jsonObject.getBoolean("success")) {
                             callback.onError(jsonObject.getString("message"));
                         } else {
-                            callback.onSuccess(jsonObject.getJSONObject("result"));
+                            callback.onSuccess(jsonObject);
                         }
                     }
                 });

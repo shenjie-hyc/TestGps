@@ -10,7 +10,17 @@ public class GpsBean {
     String img1Url;
     String img2Url;
     String img3Url;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     String img4Url;
+    String address;
     double lng;
     double lat;
 
