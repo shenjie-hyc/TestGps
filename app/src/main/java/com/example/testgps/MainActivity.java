@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.testgps.history.HistoryActivity;
 import com.example.testgps.model.UserModel;
 import com.example.testgps.model.bean.UserBean;
 import com.example.testgps.submit.SubmitActivity;
@@ -38,13 +39,12 @@ public class MainActivity extends AppCompatActivity {
         btn_view_list.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                startActivity(new Intent(MainActivity.this, HistoryActivity.class));
             }
         });
     }
     private void initData(){
         UserBean userBean = UserModel.getUserModel().getUserBean();
-
         txt_id.setText(userBean.getWorkNo());
         txt_name.setText(userBean.getRealname());
     }

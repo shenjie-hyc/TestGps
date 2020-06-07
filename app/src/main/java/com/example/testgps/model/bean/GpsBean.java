@@ -1,9 +1,11 @@
 package com.example.testgps.model.bean;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GpsBean {
+public class GpsBean implements Serializable {
+    static final long serialVersionUID = 42L;
     String createBy;
     String createTime;
     String id;

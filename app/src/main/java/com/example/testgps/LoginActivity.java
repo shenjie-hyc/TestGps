@@ -37,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("username", editName.getText().toString());
                 jsonObject.put("password", editPassword.getText().toString());
-                HttpUtil.post("/sys/login", jsonObject, new HttpUtil.MyCallback() {
+                HttpUtil.post("/sys/login", jsonObject, new HttpUtil.MyCallBack() {
                     @Override
                     public void onFailure(String message) {
                         ToastUtil.showToast(LoginActivity.this, message);

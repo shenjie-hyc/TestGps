@@ -4,7 +4,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -18,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONObject;
 import com.amap.api.location.AMapLocation;
@@ -25,7 +25,6 @@ import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.Engine;
 import com.example.testgps.R;
 import com.example.testgps.http.HttpUtil;
 import com.example.testgps.model.bean.GpsBean;
@@ -38,12 +37,14 @@ import com.luck.picture.lib.entity.LocalMedia;
 import com.luck.picture.lib.listener.OnResultCallbackListener;
 
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class SubmitActivity extends AppCompatActivity implements AMapLocationListener, ActivityCompat.OnRequestPermissionsResultCallback, View.OnClickListener {
+    public static final String GPS_KEY = "gpsBean";
     private static final int PERMISSON_REQUESTCODE = 0;
     protected String[] needPermissions = {
             Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -70,8 +71,20 @@ public class SubmitActivity extends AppCompatActivity implements AMapLocationLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_submit);
         initView();
+        Serializable bean = getIntent().getSerializableExtra(GPS_KEY);
+        if(bean != null){
+            gpsBean = (GpsBean)bean;
+            updateView();
+            img1.setClickable(false);
+            img2.setClickable(false);
+            img3.setClickable(false);
+            img4.setClickable(false);
+            btn_gps.setVisibility(View.GONE);
+            btn_submit.setVisibility(View.GONE);
+        }
     }
 
     private void initView() {
@@ -97,8 +110,15 @@ public class SubmitActivity extends AppCompatActivity implements AMapLocationLis
         img4 = (ImageView) findViewById(R.id.img4);
         img4.setOnClickListener(this);
         btn_submit.setOnClickListener(this);
+
+        updateView();
     }
 
+    private void updateView(){
+        updateImg();
+        txt_gps.setText(String.format("当前位置：经度： %1$f 纬度： %2$f",gpsBean.getLat(),gpsBean.getLng()));
+        txt_address.setText(gpsBean.getAddress());
+    }
     public void clickAddPic(final int index) {
         PictureSelector.create(this)
                 .openGallery(PictureMimeType.ofAll())
@@ -145,12 +165,11 @@ public class SubmitActivity extends AppCompatActivity implements AMapLocationLis
                 //定位成功回调信息，设置相关消息
                 amapLocation.getLocationType();
                 //获取当前定位结果来源，如网络定位结果，详见定位类型表
-                lat = amapLocation.getLatitude();
-                lon = amapLocation.getLongitude();
+                gpsBean.setLat(amapLocation.getLatitude());
+                gpsBean.setLng(amapLocation.getLongitude());
                 amapLocation.getAccuracy();
-                address = amapLocation.getAddress();
-                txt_gps.setText(String.format("当前位置：经度： %1$f 纬度： %2$f", lat, lon));
-                txt_address.setText(address);
+                gpsBean.setAddress(amapLocation.getAddress());
+                updateView();
 
 //                //获取精度信息
 //                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -259,7 +278,7 @@ public class SubmitActivity extends AppCompatActivity implements AMapLocationLis
     private void upImg(List<LocalMedia> result, int index) {
         LocalMedia localMedia = result.get(0);
         try {
-            HttpUtil.uploadFile(localMedia.getPath(), localMedia.getFileName(), new HttpUtil.MyCallback() {
+            HttpUtil.uploadFile(localMedia.getPath(), localMedia.getFileName(), new HttpUtil.MyCallBack() {
                 @Override
                 public void onFailure(String message) {
                     ToastUtil.showToast(SubmitActivity.this, message);
@@ -359,14 +378,11 @@ public class SubmitActivity extends AppCompatActivity implements AMapLocationLis
     }
     private void submit(){
         //int [] ids = getResources().getIntArray(R.array.aaa);
-        gpsBean.setLat(lat);
-        gpsBean.setLng(lon);
-        gpsBean.setAddress(address);
         if(gpsBean.getLat() == 0){
             ToastUtil.showToast(this,"请先定位！");
             return;
         }
-        HttpUtil.post("gps/add", gpsBean, new HttpUtil.MyCallback() {
+        HttpUtil.post("gps/add", gpsBean, new HttpUtil.MyCallBack() {
             @Override
             public void onFailure(String message) {
                 ToastUtil.showToast(SubmitActivity.this,"请先定位！");
