@@ -377,12 +377,13 @@ public class SubmitActivity extends AppCompatActivity implements AMapLocationLis
         }
     }
     private void submit(){
-        //int [] ids = getResources().getIntArray(R.array.aaa);
         if(gpsBean.getLat() == 0){
             ToastUtil.showToast(this,"请先定位！");
             return;
         }
-        HttpUtil.post("gps/add", gpsBean, new HttpUtil.MyCallBack() {
+        JSONObject jsonObject = (JSONObject)JSONObject.toJSON(gpsBean);
+        jsonObject.put("createBy","沈洁");
+        HttpUtil.post("gps/add", jsonObject, new HttpUtil.MyCallBack() {
             @Override
             public void onFailure(String message) {
                 ToastUtil.showToast(SubmitActivity.this,"请先定位！");
